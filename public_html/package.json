@@ -1,0 +1,22 @@
+{
+	"name": "inpagelookup",
+	"version": "2.1.0",
+	"description": "Makes it so that you can look up works on a page without needing to navigate away from that page",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/TheOtherRealm/InPageLookup.git"
+	},
+	"license": "AGPL-3.0-or-later",
+	"keywords": [
+		"util",
+		"functional",
+		"server",
+		"client",
+		"browser"
+	],
+	"author": "Aaron E-J <the at otherrealm.org>",
+	"contributors": [],
+	"dependencies": {
+		"jquery": "3.5.1"
+	}
+}
