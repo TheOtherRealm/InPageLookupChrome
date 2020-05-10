@@ -41,7 +41,7 @@
 	$(document).keydown(function (e) {
 		if (!ks.includes(e.code)) {
 			ks.push(e.code);
-		}console.log(e.code, ks);
+		}
 		if (arrayAMatch(rightKeys['getSelectedPedia'])(ks)) {
 			getSelectedPedia();
 		}
