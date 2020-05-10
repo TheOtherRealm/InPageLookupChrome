@@ -12,13 +12,13 @@
  GNU Affero General Public License for more details: 
  <http://www.gnu.org/licenses/>.
  */
-/* global browser */
+/* global chrome */
 /** 
  * Create event listeners to log things happening
  */
 function onCreated() {
-	if (browser.runtime.lastError) {
-		console.log(`Error: ${browser.runtime.lastError}`);
+	if (chrome.runtime.lastError) {
+		console.log(`Error: ${chrome.runtime.lastError}`);
 	} else {
 		console.log("Lookup div created successfully");
 	}
@@ -32,12 +32,12 @@ function onError(error) {
 /**
  * Create the menu items
  */
-browser.menus.create({
+chrome.contextMenus.create({
 	id: "getSelectedPedia",
 	title: "Search Wikipedia",
 	contexts: ["all"]
 }, onCreated);
-browser.menus.create({
+chrome.contextMenus.create({
 	id: "getSelectedTionary",
 	title: "Search Wiktionary",
 	contexts: ["all"]
@@ -46,14 +46,14 @@ browser.menus.create({
  * Give actions to menu items so that they create the iframes and pass relevent data to the page
  */
 var openWiki = function (frameId, wiki) {
-	browser.tabs.query({ active: true, lastFocusedWindow: true, currentWindow: true }, function (tabs) {
-		browser.tabs.sendMessage(tabs[0].id, { wiki: wiki, frameId: frameId, tabId: tabs[0].id }, { frameId: frameId });
+	chrome.tabs.query({ active: true, lastFocusedWindow: true, currentWindow: true }, function (tabs) {
+		chrome.tabs.sendMessage(tabs[0].id, { wiki: wiki, frameId: frameId, tabId: tabs[0].id }, { frameId: frameId });
 	});
 };
 /** 
  * The click event listener, where we perform the appropriate action given the ID of the menu item that was clicked.
  */
-browser.menus.onClicked.addListener((info, tab) => {
+chrome.contextMenus.onClicked.addListener((info, tab) => {
 	wikipedia(info);
 });
 var wikipedia = function (info) {

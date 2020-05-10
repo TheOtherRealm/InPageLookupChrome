@@ -23,8 +23,7 @@
 	 * Update the UI: set the value of the commands textboxs.
 	 */
 	function updateUI() {
-		var commands = browser.storage.local.get('options');
-		commands.then((c) => {
+		var commands = chrome.storage.local.get('options',function(c) {
 			if (c.options) {
 				for (var i = 0; i < c.options.length; i++) {
 					for (commandName of commandNames) {
@@ -55,14 +54,14 @@
 				});
 			}
 		})
-		browser.storage.local.set(combo);
+		chrome.storage.local.set(combo);
 	}
 	/**
 	 * Reset the commands and update the textbox.
 	 */
 	function resetShortcut() {
 		var o = JSON.parse(JSON.stringify(options));
-		browser.storage.local.set({ "options": o })
+		chrome.storage.local.set({ "options": o })
 			.then(updateUI, onError)
 	}
 	/**

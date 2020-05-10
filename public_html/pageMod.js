@@ -12,7 +12,7 @@
  GNU Affero General Public License for more details: 
  <http://www.gnu.org/licenses/>.
  */
-/* global browser, top, self */
+/* global chrome, top, self */
 (function () {
 	var selObj = '';
 	selObj = window.getSelection();
@@ -22,9 +22,7 @@
 	const aMatch = typed => stored => typed == stored;
 	const arrayAMatch = arrayCompare(aMatch);
 	var rightKeys = [];
-	var options = browser.storage.local.get('options');
-	options.then(combo, error);
-	function combo(opt) {
+	var options = chrome.storage.sync.get('options', function (opt) {
 		if (Object.keys(opt).length === 0 && opt.constructor === Object) {
 			resetShortcut();
 		}
@@ -36,14 +34,14 @@
 				}
 			});
 		});
-	}
+	});
 	function error(e) {
 		console.log(e, "error");
 	}
 	$(document).keydown(function (e) {
 		if (!ks.includes(e.code)) {
 			ks.push(e.code);
-		}
+		}console.log(e.code, ks);
 		if (arrayAMatch(rightKeys['getSelectedPedia'])(ks)) {
 			getSelectedPedia();
 		}
@@ -91,7 +89,7 @@
 	};
 	$('body').prepend('<div id="wikiWrap" class="wikiWrapper"></div>');
 	//handle menu button pressing
-	browser.runtime.onMessage.addListener(
+	chrome.runtime.onMessage.addListener(
 		function (request, sender, sendResponse) {
 			if (document.activeElement) {
 				if (request.wiki === "getSelectedPedia") {

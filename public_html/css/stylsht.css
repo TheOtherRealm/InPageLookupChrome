@@ -18,6 +18,9 @@
 	-moz-border-radius: 15px;
 	border-radius: 15px;
 }
+input[type="text"]{ 
+	width: 100%;
+}
 #moveIconBtn {
 	position: absolute;
 	top: -23px;
