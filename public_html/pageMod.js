@@ -14,6 +14,7 @@
  */
 /* global chrome, top, self */
 (function () {
+	console.log(window);
 	var selObj = '';
 	selObj = window.getSelection();
 	var nOfLookups = 0;
@@ -39,6 +40,8 @@
 		console.log(e, "error");
 	}
 	$(document).keydown(function (e) {
+		console.log(window.getSelection());
+		// console.log(e.code,e);
 		if (!ks.includes(e.code)) {
 			ks.push(e.code);
 		}
@@ -55,8 +58,9 @@
 	$(document).keyup(function (e) {
 		ks.pop();
 	});
-	var getSelectedPedia = function () {
-		selObj = window.getSelection();
+	var getSelectedPedia = function (c) {
+		selObj = c ? c : window.getSelection();
+		console.log(selObj);
 		nOfLookups++;
 		$('.wikiWrapper').append('<div class="wikiAddonDivRap" id="' + nOfLookups + '" style="position: fixed;  top:' + (nOfLookups * 10) + 'px;left:' + (nOfLookups * 10) + 'px"">' +
 			'<div class="btnForTheAddon btn-large IconBtnForTheAddon" type="button" style="padding: 5px;font-family: Arial, Helvetica, sans-serif; font-size: 30px;" id="moveIconBtn"> + </div>' +
@@ -72,7 +76,7 @@
 		});
 	};
 	var getSelectedTionary = function (c) {
-		selObj = window.getSelection();
+		selObj = c ? c : window.getSelection();
 		nOfLookups++;
 		$('.wikiWrapper').append('<div class="wikiAddonDivRap" id="' + nOfLookups + '" style="position: fixed;  top:' + nOfLookups * 10 + 'px;left:' + nOfLookups * 10 + 'px"">' +
 			'<div class="btnForTheAddon btn-large IconBtnForTheAddon" type="button" style="padding: 5px;font-family: Arial, Helvetica, sans-serif; font-size: 30px;" id="moveIconBtn"> + </div>' +
@@ -88,12 +92,46 @@
 		});
 	};
 	$('body').prepend('<div id="wikiWrap" class="wikiWrapper"></div>');
+	function getPdfSelectedText() {
+		console.log('getPdfSelectedText');
+		return new Promise(resolve => {
+			window.addEventListener('message', function onMessage(e) {
+				if (e.origin === 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai' &&
+					e.data && e.data.type === 'getSelectedTextReply') {
+					console.log($('embed'));
+					console.log(e.data.selectedText);
+					window.removeEventListener('message', onMessage);
+					resolve(e.data.selectedText);
+				}
+			});
+			// console.log($('embed')[0].type);
+			if ($('embed')[0] !== undefined) {
+				if ($('embed')[0].type == 'application/pdf') {
+					const script = document.createElement('script');
+					document.documentElement.appendChild(script).text =
+						"document.querySelector('embed').postMessage({type: 'getSelectedText'}, '*')";
+					console.log(script);
+					script.remove();
+				}
+			} else {
+				resolve(window.getSelection());
+			}
+		});
+	}
+	// chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+	// 	console.log(msg, sender, sendResponse);
+	// 	if (msg === 'getPdfSelection') {
+	// 		getPdfSelectedText().then((selected) => { getSelectedPedia(selected) });
+	// 		return true;
+	// 	}
+	// });
 	//handle menu button pressing
 	chrome.runtime.onMessage.addListener(
 		function (request, sender, sendResponse) {
 			if (document.activeElement) {
 				if (request.wiki === "getSelectedPedia") {
-					getSelectedPedia();
+					console.log(request, sender.origin, sendResponse.origin)
+					getPdfSelectedText().then((selected) => { getSelectedPedia(selected) });
 				}
 				if (request.wiki === "getSelectedTionary") {
 					getSelectedTionary();
