@@ -14,11 +14,10 @@
  */
 /* global chrome, top, self */
 (function () {
-	console.log(window);
+	console.log(getPdfSelectedText().then((selected) => { return selected }));
 	var selObj = '';
 	selObj = window.getSelection();
 	var nOfLookups = 0;
-	var ks = [];
 	const arrayCompare = f => ([x, ...xs]) => ([y, ...ys]) => x === undefined && y === undefined ? true : Boolean(f(x)(y)) && arrayCompare(f)(xs)(ys);
 	const aMatch = typed => stored => typed == stored;
 	const arrayAMatch = arrayCompare(aMatch);
@@ -39,9 +38,15 @@
 	function error(e) {
 		console.log(e, "error");
 	}
-	$(document).keydown(function (e) {
-		console.log(window.getSelection());
-		// console.log(e.code,e);
+	// if ($('embed')[0] !== undefined) {
+	// 	if ($('embed')[0].type == 'application/pdf') {
+
+	// 	}
+	// }
+	var ks = [];
+	document.addEventListener('keydown', (e) => {
+		// console.log(window.getSelection());
+		console.log(getPdfSelectedText().then((selected) => { return selected }));
 		if (!ks.includes(e.code)) {
 			ks.push(e.code);
 		}
@@ -54,10 +59,11 @@
 		else if (arrayAMatch(rightKeys['removeSelected'])(ks)) {
 			closeWiki();
 		}
-	})
-	$(document).keyup(function (e) {
+	}, false);
+	// }
+	document.addEventListener('keyup', (e) => {
 		ks.pop();
-	});
+	}, false);
 	var getSelectedPedia = function (c) {
 		selObj = c ? c : window.getSelection();
 		console.log(selObj);
@@ -96,10 +102,10 @@
 		console.log('getPdfSelectedText');
 		return new Promise(resolve => {
 			window.addEventListener('message', function onMessage(e) {
+				console.log(e);
 				if (e.origin === 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai' &&
 					e.data && e.data.type === 'getSelectedTextReply') {
-					console.log($('embed'));
-					console.log(e.data.selectedText);
+					console.log(e);
 					window.removeEventListener('message', onMessage);
 					resolve(e.data.selectedText);
 				}
@@ -109,22 +115,17 @@
 				if ($('embed')[0].type == 'application/pdf') {
 					const script = document.createElement('script');
 					document.documentElement.appendChild(script).text =
-						"document.querySelector('embed').postMessage({type: 'getSelectedText'}, '*')";
+						"console.log('hello');\
+						document.querySelector('embed').postMessage({type: 'sendKeyEvent'}, '*');\
+						document.querySelector('embed').postMessage({type: 'getSelectedText'}, '*');";
 					console.log(script);
-					script.remove();
+					// script.remove();
 				}
 			} else {
 				resolve(window.getSelection());
 			}
 		});
 	}
-	// chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-	// 	console.log(msg, sender, sendResponse);
-	// 	if (msg === 'getPdfSelection') {
-	// 		getPdfSelectedText().then((selected) => { getSelectedPedia(selected) });
-	// 		return true;
-	// 	}
-	// });
 	//handle menu button pressing
 	chrome.runtime.onMessage.addListener(
 		function (request, sender, sendResponse) {
@@ -134,10 +135,18 @@
 					getPdfSelectedText().then((selected) => { getSelectedPedia(selected) });
 				}
 				if (request.wiki === "getSelectedTionary") {
-					getSelectedTionary();
+					getPdfSelectedText().then((selected) => { getSelectedTionary(selected) });
 				}
 				if (request.wiki === "closeWiki") {
-					closeWiki();
+					if ($('embed')[0] !== undefined) {
+						if ($('embed')[0].type == 'application/pdf') {
+							getPdfSelectedText().then(() => { closeWiki() });
+						}
+					} else {
+						closeWiki();
+					}
+				} if (request === "sendKeyEvent") {
+					console.log(request, sender.origin, sendResponse)
 				}
 			}
 		});
