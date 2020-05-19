@@ -14,7 +14,6 @@
  */
 /* global chrome, top, self */
 (function () {
-	console.log(getPdfSelectedText().then((selected) => { return selected }));
 	var selObj = '';
 	selObj = window.getSelection();
 	var nOfLookups = 0;
@@ -59,7 +58,6 @@
 	}, false);
 	var getSelectedPedia = function (c) {
 		selObj = c ? c : window.getSelection();
-		console.log(selObj);
 		nOfLookups++;
 		$('.wikiWrapper').append('<div class="wikiAddonDivRap" id="' + nOfLookups + '" style="position: fixed;  top:' + (nOfLookups * 10) + 'px;left:' + (nOfLookups * 10) + 'px"">' +
 			'<div class="btnForTheAddon btn-large IconBtnForTheAddon" type="button" style="padding: 5px;font-family: Arial, Helvetica, sans-serif; font-size: 30px;" id="moveIconBtn"> + </div>' +
@@ -92,26 +90,20 @@
 	};
 	$('body').prepend('<div id="wikiWrap" class="wikiWrapper"></div>');
 	function getPdfSelectedText() {
-		console.log('getPdfSelectedText');
 		return new Promise(resolve => {
 			window.addEventListener('message', function onMessage(e) {
-				console.log(e);
 				if (e.origin === 'chrome-extension://mhjfbmdgcfjbbpaeojofohoefgiehjai' &&
 					e.data && e.data.type === 'getSelectedTextReply') {
-					console.log(e);
 					window.removeEventListener('message', onMessage);
 					resolve(e.data.selectedText);
 				}
 			});
-			// console.log($('embed')[0].type);
 			if ($('embed')[0] !== undefined) {
 				if ($('embed')[0].type == 'application/pdf') {
 					const script = document.createElement('script');
 					document.documentElement.appendChild(script).text =
-						"console.log('hello');\
-						document.querySelector('embed').postMessage({type: 'getSelectedText'}, '*');";
-					console.log(script);
-					// script.remove();
+						"document.querySelector('embed').postMessage({type: 'getSelectedText'}, '*');";
+					script.remove();
 				}
 			} else {
 				resolve(window.getSelection());
@@ -123,7 +115,6 @@
 		function (request, sender, sendResponse) {
 			if (document.activeElement) {
 				if (request.wiki === "getSelectedPedia") {
-					console.log(request, sender.origin, sendResponse.origin)
 					getPdfSelectedText().then((selected) => { getSelectedPedia(selected) });
 				}
 				if (request.wiki === "getSelectedTionary") {
@@ -137,7 +128,7 @@
 					} else {
 						closeWiki();
 					}
-				} 
+				}
 			}
 		});
 	//remove the iframe when the key combinations are pressed or the 'X' button is pressed
