@@ -38,15 +38,8 @@
 	function error(e) {
 		console.log(e, "error");
 	}
-	// if ($('embed')[0] !== undefined) {
-	// 	if ($('embed')[0].type == 'application/pdf') {
-
-	// 	}
-	// }
 	var ks = [];
 	document.addEventListener('keydown', (e) => {
-		// console.log(window.getSelection());
-		console.log(getPdfSelectedText().then((selected) => { return selected }));
 		if (!ks.includes(e.code)) {
 			ks.push(e.code);
 		}
@@ -116,7 +109,6 @@
 					const script = document.createElement('script');
 					document.documentElement.appendChild(script).text =
 						"console.log('hello');\
-						document.querySelector('embed').postMessage({type: 'sendKeyEvent'}, '*');\
 						document.querySelector('embed').postMessage({type: 'getSelectedText'}, '*');";
 					console.log(script);
 					// script.remove();
@@ -145,9 +137,7 @@
 					} else {
 						closeWiki();
 					}
-				} if (request === "sendKeyEvent") {
-					console.log(request, sender.origin, sendResponse)
-				}
+				} 
 			}
 		});
 	//remove the iframe when the key combinations are pressed or the 'X' button is pressed
